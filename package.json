@@ -1,0 +1,50 @@
+{
+    "name": "aim-bot",
+    "displayName": "AimBot",
+    "description": "AimBot",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:aimBot.start"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "aimBot.start",
+                "title": "start aimBot",
+                "category": "aimBot"
+            }
+        ],
+        "configuration": {
+            "title": "aimBot",
+            "properties": {
+                "aimBot.testCount": {
+                    "type": "number",
+                    "default": 10,
+                    "description": "testCount"
+                },
+                "aimBot.timeoutMs": {
+                    "type": "number",
+                    "default": 1000,
+                    "description": "timeoutMs"
+                },
+                "aimBot.intervalMs": {
+                    "type": "number",
+                    "default": 500,
+                    "description": "intervalMs"
+                },
+                "aimBot.difficulty": {
+                    "type": "number",
+                    "default": 2,
+                    "description": "difficulty"
+                }
+            }
+        }
+    }
+}
