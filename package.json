@@ -1,48 +1,224 @@
 {
-    "name": "aim-bot",
-    "displayName": "AimBot",
-    "description": "AimBot",
-    "version": "0.0.1",
+    "name": "aimlab",
+    "displayName": "AimLab",
+    "description": "In-editor aim training: practice flicks, click accuracy and target tracking on a read-only copy of your current file, with Count, Timed and Tracking modes and per-run stats.",
+    "version": "1.0.0",
+    "icon": "media/aimlab-icon.png",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "publisher": "leodu",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/leoduu/VSCode-AimLab"
+    },
     "engines": {
-        "vscode": "^1.60.0"
+        "vscode": "^1.67.0"
     },
     "categories": [
+        "Education",
         "Other"
     ],
+    "keywords": [
+        "aim trainer",
+        "aimlab",
+        "mouse accuracy",
+        "reaction time",
+        "target practice",
+        "flick",
+        "tracking",
+        "aim training",
+        "precision",
+        "reflex",
+        "practice"
+    ],
+    "galleryBanner": {
+        "color": "#1F2330",
+        "theme": "dark"
+    },
     "activationEvents": [
-        "onCommand:aimBot.start"
+        "onCommand:aimlab.start",
+        "onCommand:aimlab.stop",
+        "onCommand:aimlab.restart",
+        "onCommand:aimlab.pause",
+        "onCommand:aimlab.resume",
+        "onCommand:aimlab.clearHistory",
+        "onCommand:aimlab.editSetting",
+        "onCommand:aimlab.openSettings",
+        "onView:aimlab.sidebar"
     ],
     "main": "./extension.js",
     "contributes": {
         "commands": [
             {
-                "command": "aimBot.start",
-                "title": "start aimBot",
-                "category": "aimBot"
+                "command": "aimlab.start",
+                "title": "Start",
+                "category": "Aimlab"
+            },
+            {
+                "command": "aimlab.stop",
+                "title": "Stop",
+                "category": "Aimlab"
+            },
+            {
+                "command": "aimlab.restart",
+                "title": "Restart",
+                "category": "Aimlab"
+            },
+            {
+                "command": "aimlab.pause",
+                "title": "Pause",
+                "category": "Aimlab"
+            },
+            {
+                "command": "aimlab.resume",
+                "title": "Resume",
+                "category": "Aimlab"
+            },
+            {
+                "command": "aimlab.clearHistory",
+                "title": "Clear History",
+                "category": "Aimlab"
+            },
+            {
+                "command": "aimlab.openSettings",
+                "title": "Open Settings",
+                "category": "Aimlab"
             }
         ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "aimlab",
+                    "title": "Aimlab",
+                    "icon": "media/aimlab-apex.svg"
+                }
+            ]
+        },
+        "views": {
+            "aimlab": [
+                {
+                    "id": "aimlab.sidebar",
+                    "name": "Aimlab"
+                }
+            ]
+        },
         "configuration": {
-            "title": "aimBot",
+            "title": "Aimlab",
             "properties": {
-                "aimBot.testCount": {
-                    "type": "number",
-                    "default": 10,
-                    "description": "testCount"
+                "aimlab.mode": {
+                    "type": "string",
+                    "enum": [
+                        "count",
+                        "timed",
+                        "tracking"
+                    ],
+                    "enumDescriptions": [
+                        "Finish after the configured number of targets.",
+                        "Finish when the configured duration elapses.",
+                        "Follow a moving target for the configured duration and score time on target."
+                    ],
+                    "default": "count",
+                    "description": "Training mode."
                 },
-                "aimBot.timeoutMs": {
-                    "type": "number",
-                    "default": 1000,
-                    "description": "timeoutMs"
+                "aimlab.difficulty": {
+                    "type": "string",
+                    "enum": [
+                        "easy",
+                        "medium",
+                        "hard",
+                        "extreme",
+                        "custom"
+                    ],
+                    "enumDescriptions": [
+                        "Height 3, Width 5, Timeout 2000 ms, Tracking Speed 2.",
+                        "Height 2, Width 4, Timeout 1200 ms, Tracking Speed 4.",
+                        "Height 1, Width 2, Timeout 800 ms, Tracking Speed 6.",
+                        "Height 1, Width 1, Timeout 800 ms, Tracking Speed 8.",
+                        "Use the values stored in aimlab.custom."
+                    ],
+                    "default": "medium",
+                    "description": "Difficulty preset or custom target geometry."
                 },
-                "aimBot.intervalMs": {
-                    "type": "number",
-                    "default": 500,
-                    "description": "intervalMs"
+                "aimlab.range": {
+                    "type": "string",
+                    "enum": [
+                        "narrow",
+                        "medium",
+                        "wide",
+                        "full"
+                    ],
+                    "enumDescriptions": [
+                        "Targets spawn in the central 40% of the visible area.",
+                        "Targets spawn in the central 60% of the visible area.",
+                        "Targets spawn in the central 80% of the visible area.",
+                        "Targets spawn anywhere in the visible area."
+                    ],
+                    "default": "medium",
+                    "description": "Centered target area as a percentage of the visible editor."
                 },
-                "aimBot.difficulty": {
+                "aimlab.trackingMotion": {
+                    "type": "string",
+                    "enum": [
+                        "smooth",
+                        "sharp"
+                    ],
+                    "enumDescriptions": [
+                        "Constant-speed elliptical drift without slowdowns at turns.",
+                        "Straight lines with sudden sharp direction changes."
+                    ],
+                    "default": "smooth",
+                    "description": "How the tracking target moves. Only used in tracking mode."
+                },
+            "aimlab.testCount": {
                     "type": "number",
-                    "default": 2,
-                    "description": "difficulty"
+                    "default": 20,
+                    "minimum": 1,
+                    "maximum": 1000,
+                    "description": "Number of targets in count mode."
+                },
+                "aimlab.durationSeconds": {
+                    "type": "number",
+                    "default": 30,
+                    "minimum": 5,
+                    "maximum": 3600,
+                    "description": "Training duration in timed and tracking modes."
+                },
+                "aimlab.intervalMs": {
+                    "type": "number",
+                    "default": 100,
+                    "minimum": 0,
+                    "maximum": 10000,
+                    "description": "Delay between targets in timed mode."
+                },
+                "aimlab.custom": {
+                    "type": "object",
+                    "default": {},
+                    "properties": {
+                        "height": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 10,
+                            "description": "Target height in lines."
+                        },
+                        "width": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 20,
+                            "description": "Target width in characters."
+                        },
+                        "timeoutMs": {
+                            "type": "number",
+                            "minimum": 100,
+                            "maximum": 60000,
+                            "description": "Maximum time allowed for each target in timed mode."
+                        },
+                        "speed": {
+                            "type": "number",
+                            "minimum": 1,
+                            "maximum": 10,
+                            "description": "Tracking target speed from 1 (slow) to 10 (fast)."
+                        }
+                    },
+                    "description": "Custom difficulty values used when aimlab.difficulty is custom."
                 }
             }
         }
